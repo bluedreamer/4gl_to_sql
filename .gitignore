@@ -12,3 +12,7 @@ hidden/
 schema/
 .idea/
 cmake-build-debug/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
