@@ -36,10 +36,10 @@ void Field::reset()
 std::string Field::getMysqlType() const
 {
    std::ostringstream strm;
-   switch( type_.get() )
+   switch( type_.value() )
    {
       case character:
-         strm << "VARCHAR(" << length_.get() << ")";
+         strm << "VARCHAR(" << length_.value() << ")";
          break;
       case integer:
          strm << "INT";
@@ -51,7 +51,7 @@ std::string Field::getMysqlType() const
          strm << "TINYINT(1)";
          break;
       case decimal:
-         strm << "DECIMAL(" << length_.get() << ", " << decimals_.get() << ")";
+         strm << "DECIMAL(" << length_.value() << ", " << decimals_.value() << ")";
          break;
       case datetimetz:
          strm << "DATETIME";
@@ -64,7 +64,7 @@ std::string Field::getMysqlType() const
          strm << "BLOB";
          break;
       default:
-         strm << "No mapping for field type: [" << type_.get() << "]\n";
+         strm << "No mapping for field type: [" << type_.value() << "]\n";
          throw std::logic_error( strm.str() );
    }
    return strm.str();
@@ -93,14 +93,14 @@ std::string Field::getMysqlComment() const
    }
    std::ostringstream strm;
 
-   strm << " COMMENT '" << description_.get() << "' ";
+   strm << " COMMENT '" << description_.value() << "' ";
    return strm.str();
 }
 
 std::ostream &operator<<( std::ostream &os, const Field &field)
 {
    // not outputing recid's
-   if( field.type_.get() != Field::recid)
+   if( field.type_.value() != Field::recid)
    {
       os << "   `" << field.name_ << "` " << field.getMysqlType() << field.getMysqlNull() << field.getMysqlComment();
    }
@@ -110,7 +110,7 @@ std::ostream &operator<<( std::ostream &os, const Field &field)
 void Field::readData( std::istream &is )
 {
    std::ostringstream strm;
-   const datatype type = type_.get();
+   const datatype type = type_.value();
    switch( type )
    {
       case integer:
@@ -205,7 +205,7 @@ void Field::readData( std::istream &is )
          // lets check not escaped quote at start
          while( c == '"' && is.peek() == '"' )
          {
-            if( char_count > length_.get() + 10) throw std::logic_error( "too longA " + strm.str());
+            if( char_count > length_.value() + 10) throw std::logic_error( "too longA " + strm.str());
             strm << '"';
             // skip the peek
             c = is.get(); ++char_count;
@@ -214,7 +214,7 @@ void Field::readData( std::istream &is )
          }
          while( c != '"' )
          {
-            if( char_count > length_.get() + 10) break;
+            if( char_count > length_.value() + 10) break;
             if( c == '\\' )
             {
                strm << '\\';
@@ -228,7 +228,7 @@ void Field::readData( std::istream &is )
             // check if this is an escaped quote
             while( c == '"' && is.peek() == '"' )
             {
-            if( char_count > length_.get() + 10) throw std::logic_error( "too longC " + strm.str());
+            if( char_count > length_.value() + 10) throw std::logic_error( "too longC " + strm.str());
                strm << '"';
                // skip the peek
                c = is.get(); ++char_count;
@@ -310,7 +310,7 @@ void Field::readData( std::istream &is )
    fieldData_ = strm.str();
 }
 
-std::string Field::schemaName_ = "INFO_fields";
+std::string Field::schemaName_ = "DB_fields";
 
 std::string Field::schema()
 {
@@ -347,8 +347,8 @@ std::string Field::insertStatement() const
    //<< " (name, tablename, type, `order`, mandatory, length, description, casesensitive, decimals, position, initial, format, label, columnlabel, help, valexp, valmsg, extent) ";
    strm << " VALUES(";
    strm << '\'' << name_ << "',";
-   strm << '\'' << tableName_.get() << "',";
-   strm << type_.get() + 1 << ", ";
+   strm << '\'' << tableName_.value() << "',";
+   strm << type_.value() + 1 << ", ";
 //   printOptional( strm, type_, false );
    printOptional( strm, order_, false );
    printOptional( strm, mandatory_, false );
@@ -368,3 +368,88 @@ std::string Field::insertStatement() const
    strm << ");\n";
    return strm.str();
 }
+
+int Field::getOrder() const
+{
+   if( order_ )
+   {
+      return order_.value();
+   }
+   else
+   {
+      return -1;
+   }
+}
+
+size_t Field::getExtentOrder() const
+{
+   return extentOrder_;
+}
+
+size_t Field::getExtent() const
+{
+   if ( extent_ )
+      return extent_.value();
+   else
+      return 1;
+}
+
+const std::string& Field::getName() const { return name_; }
+
+int Field::getLength() const { return length_.value(); }
+
+void Field::printData(std::ostream& os) { os << fieldData_; }
+
+void Field::setDescription(const std::string& s) {
+   description_ = trimquote(s);
+   escapestring(description_.value());
+}
+
+void Field::setCaseSensitive() { caseSensitive_ = true; }
+
+void Field::setDecimal(int d) { decimals_ = d; }
+
+void Field::setOrder(int d) { order_ = d; }
+
+void Field::setMandatory() { mandatory_ = true; }
+
+void Field::setPosition(int d) { position_ = d; }
+
+void Field::setName(const std::string& name) { name_ = trimquote(name); }
+
+void Field::setType(int type) { type_ = (datatype) type; }
+
+void Field::setLength(int len) { length_ = len; }
+
+void Field::setTable(const std::string& s) { tableName_ = trimquote(s); }
+
+void Field::setInitial(const std::string& s) { initial_ = trimquote(s); }
+
+void Field::setFormat(const std::string& s) { format_ = trimquote(s); }
+
+void Field::setLabel(const std::string& s) {
+   label_ = trimquote(s);
+   escapestring(label_.value());
+}
+
+void Field::setColumnLabel(const std::string& s) {
+   columnLabel_ = trimquote(s);
+   escapestring(columnLabel_.value());
+}
+
+void Field::setHelp(const std::string& s) {
+   help_ = trimquote(s);
+   escapestring(help_.value());
+}
+
+void Field::setValexp(const std::string& s) {
+   valexp_ = trimquote(s);
+   escapestring(valexp_.value());
+}
+
+void Field::setValmsg(const std::string& s) {
+   valmsg_ = trimquote(s);
+   escapestring(valmsg_.value());
+}
+
+void Field::setExtentOrder(size_t i) { extentOrder_ = i; }

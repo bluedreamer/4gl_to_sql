@@ -111,7 +111,7 @@ std::string Table::getDumpName() const
    std::ostringstream strm;
    if( dumpName_ )
    {
-      strm << dumpName_.get();
+      strm << dumpName_.value();
    }
    else
    {
@@ -228,7 +228,7 @@ std::string Table::getDescription() const
 {
    if( description_ )
    {
-      return description_.get();
+      return description_.value();
    }
    return std::string();
 }

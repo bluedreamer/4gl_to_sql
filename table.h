@@ -4,8 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
-
-#include <boost/optional.hpp>
+#include <optional>
 
 #include "util.h"
 
@@ -28,11 +27,11 @@ class Table
       std::string getDescription() const;
       void reset();
       void setName( const std::string &name ) { tableName_ = trimquote( name ); }
-      void setDescription( const std::string &s ) { description_ = trimquote( s ); escapestring( description_.get() ); }
+      void setDescription( const std::string &s ) { description_ = trimquote( s ); escapestring( description_.value() ); }
       void setDumpName( const std::string &s ) { dumpName_ = trimquote( s ); }
       void setLabel( const std::string &s ) { label_ = trimquote( s ); }
       void setValexp( const std::string &s ) { valexp_ = trimquote( s ); }
-      void setValmsg( const std::string &s ) { valmsg_ = trimquote( s ); escapestring( valmsg_.get() ); }
+      void setValmsg( const std::string &s ) { valmsg_ = trimquote( s ); escapestring( valmsg_.value() ); }
       static std::string schema();
       std::string insertStatement() const;
       std::string fieldinsertStatement() const;
@@ -41,7 +40,7 @@ class Table
       {
          if( t )
          {
-            os << '\''  << t.get() << '\'';
+            os << '\''  << t.value() << '\'';
          }
          else
          {
@@ -59,12 +58,12 @@ class Table
       bool areAnyFieldsInExtentList( const std::vector<std::string> &list ) const;
       static std::string schemaName_;
       std::string tableName_;
-      boost::optional< std::string > area_;
-      boost::optional< std::string > description_;
-      boost::optional< std::string > dumpName_;
-      boost::optional< std::string > label_;
-      boost::optional< std::string > valexp_;
-      boost::optional< std::string > valmsg_;
+      std::optional< std::string > area_;
+      std::optional< std::string > description_;
+      std::optional< std::string > dumpName_;
+      std::optional< std::string > label_;
+      std::optional< std::string > valexp_;
+      std::optional< std::string > valmsg_;
 
       Fields fields_;
       Indexes indexes_;

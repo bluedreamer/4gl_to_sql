@@ -1,7 +1,7 @@
 CC_SOURCE:=${sort $(shell ls *.cc) parser.tab.cc lexer.cc}
 OBJS:=$(CC_SOURCE:.cc=.o)
 DEPS:=$(CC_SOURCE:.cc=.d)
-CXXFLAGS=-ggdb3
+CXXFLAGS=-ggdb3 -std=c++17
 LIBS=-lfl -lboost_regex
 
 infomysql: ${OBJS} parser.y lexer.l
@@ -13,7 +13,7 @@ clean:
 include ${DEPS}
 
 %.d: %.cc
-	g++ -MM $< -MF$@
+	g++ ${CXXFLAGS} -MM $< -MF$@
 
 lexer.cc: lexer.l parser.tab.h
 	flex -o lexer.cc lexer.l

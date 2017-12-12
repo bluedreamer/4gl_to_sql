@@ -36,7 +36,7 @@ class Index
       {
          if( t )
          {
-            os << t.get();
+            os << t.value();
          }
          else
          {

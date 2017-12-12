@@ -1,7 +1,7 @@
 #ifndef SEQUENCE_H
 #define SEQUENCE_H
 
-#include <boost/optional.hpp>
+#include <optional>
 
 #include "util.h"
 
@@ -23,7 +23,7 @@ class Sequence
       {
          if( t )
          {
-            os << t.get();
+            os << t.value();
          }
          else
          {
@@ -38,11 +38,11 @@ class Sequence
    private:
       static std::string schemaName_;
       std::string name_;
-      boost::optional<int> initial_;
-      boost::optional<int> increment_;
-      boost::optional<int> cycleOnLimit_;
-      boost::optional<int> minVal_;
-      boost::optional<int> maxVal_;
+      std::optional<int> initial_;
+      std::optional<int> increment_;
+      std::optional<int> cycleOnLimit_;
+      std::optional<int> minVal_;
+      std::optional<int> maxVal_;
 };
 
 #endif
