@@ -8,7 +8,7 @@
 class Sequence
 {
    public:
-      Sequence() { reset(); }
+      Sequence();
       void reset();
       void setName( const std::string &s );
       void setInitial( int i );

@@ -75,3 +75,8 @@ void Sequence::setMaxVal(int i)
    maxVal_ = i;
 }
 
+Sequence::Sequence()
+{
+   reset();
+}
+

@@ -61,43 +61,41 @@ std::ostream &operator<<(std::ostream &os, const Table &table)
    os << "DROP TABLE IF EXISTS `"<< table.tableName_ << "`;\n";
    os << "CREATE TABLE `" << table.tableName_ << "`\n";
    os << "(\n";
-   for(auto i : table)
+   bool is_first = true;
+   for(auto &i : table.fields_)
    {
-      os << (*i);
-      if( i + 1 != table.end() )
+      if(!is_first)
       {
-         os << ",\n";
+         os << ",";
       }
-      else
-      {
-         os << "\n";
-      }
+      os << i << "\n";
+      is_first = false;
    }
+   is_first=true;
    if( table.indexes_.size() && outputTableIndexes )
    {
       os << ", ";
-      for( auto i : table)
+      for( auto &i : table.indexes_)
       {
          std::vector<std::string> fieldsInIndex;
-         i->getFieldList( fieldsInIndex );
+         i.getFieldList( fieldsInIndex );
 
+         if(!is_first)
+         {
+            os << ",";
+         }
          if( table.areAnyFieldsInExtentList( fieldsInIndex ) )
          {
-            os << "#" << (*i) << "\n";
+            os << "#" << i << "\n";
             os << "# Ignoring extent field as index\n";
          }
          else
          {
-            os << (*i);
+            os << i;
          }
-         if( i + 1 != end )
-         {
-            os << ",\n";
-         }
-         else
-         {
-            os << "\n";
-         }
+         os << "\n";
+         is_first = false;
+
       }
    }
    os << ") ";
@@ -149,14 +147,16 @@ void Table::convertDumpToSql()
          std::istringstream instrm( line );
    //      std::cout << tableName_ << ':' << line << std::endl;
          out << "INSERT INTO `" << tableName_ << "` VALUES(";
-         for( auto i : fields_)
+         bool is_first = true;
+         for( auto &i : fields_)
          {
-            i->readData( instrm );
-            i->printData( out );
-            if( i + 1 != fields_.end() )
+            if(!is_first)
             {
                out << ", ";
             }
+            i.readData( instrm );
+            i.printData( out );
+            is_first = false;
          }
          out << ");\n";
 
@@ -216,9 +216,9 @@ std::string Table::fieldinsertStatement() const
    std::ostringstream strm;
    std::string debug;
    strm << "DELETE FROM `" << tableName_ << "`;\n";
-   for( auto i : fields_)
+   for( auto &i : fields_)
    {
-      strm << i->insertStatement(); 
+      strm << i.insertStatement();
       debug=strm.str();
    }
    return strm.str();
@@ -276,9 +276,9 @@ bool Table::areAnyFieldsInExtentList( const std::vector<std::string> &list ) con
 std::string Table::dumpIndexesAsAlterTable() const
 {
    std::ostringstream strm;
-   for( auto i : indexes_)
+   for( auto &i : indexes_)
    {
-      strm << i->dumpIndexesAsAlterTable( tableName_ ) << std::endl;
+      strm << i.dumpIndexesAsAlterTable( tableName_ ) << std::endl;
    }
    return strm.str();
 }
@@ -300,9 +300,9 @@ void Table::setValexp(const std::string &s)
    valexp_ = trimquote(s);
 }
 
-void Table::addIndex(const Index &index)
+void Table::addIndex(Index index)
 {
-   indexes_.push_back(index);
+   indexes_.emplace_back(index);
 }
 
 void Table::setName(const std::string &name)

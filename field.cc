@@ -36,7 +36,7 @@ void Field::reset()
 std::string Field::getMysqlType() const
 {
    std::ostringstream strm;
-   switch( type_.value() )
+   switch(type_.value())
    {
       case character:
          strm << "VARCHAR(" << length_.value() << ")";
@@ -65,7 +65,7 @@ std::string Field::getMysqlType() const
          break;
       default:
          strm << "No mapping for field type: [" << type_.value() << "]\n";
-         throw std::logic_error( strm.str() );
+         throw std::logic_error(strm.str());
    }
    return strm.str();
 }
@@ -78,7 +78,7 @@ std::string Field::getForeignKeyDef() const
 
 std::string Field::getMysqlNull() const
 {
-   if( mandatory_ )
+   if(mandatory_)
    {
       return " NOT NULL ";
    }
@@ -87,7 +87,7 @@ std::string Field::getMysqlNull() const
 
 std::string Field::getMysqlComment() const
 {
-   if( !description_ )
+   if(!description_)
    {
       return std::string();
    }
@@ -97,205 +97,203 @@ std::string Field::getMysqlComment() const
    return strm.str();
 }
 
-std::ostream &operator<<( std::ostream &os, const Field &field)
+std::ostream &operator<<(std::ostream &os, const Field &field)
 {
    // not outputing recid's
-   if( field.type_.value() != Field::recid)
+   if(field.type_.value() != Field::recid)
    {
       os << "   `" << field.name_ << "` " << field.getMysqlType() << field.getMysqlNull() << field.getMysqlComment();
    }
    return os;
 }
 
-void Field::readData( std::istream &is )
+void Field::readData(std::istream &is)
 {
    std::ostringstream strm;
    const datatype type = type_.value();
-   switch( type )
+   switch(type)
    {
       case integer:
       {
          std::string data;
          is >> data;
-         if( data.length() == 1 && data[0] == '?' || data == "\"?\"" )
+         if(data.length() == 1 && data[0] == '?' || data == "\"?\"")
          {
             //stupid nulls
             strm << "NULL";
             // skip space past ?
             is.get();
-         }
-         else if( data == "\"\"" )
+         } else if(data == "\"\"")
          {
             strm << "NULL";
             // skip space past ""
-         }
-         else
+         } else
          {
-            strm << boost::lexical_cast<int>( data );
+            strm << boost::lexical_cast<int>(data);
          }
       }
-      break;
+         break;
 
       case date:
       {
          std::string data;
          is >> data;
-         boost::regex date_exp( "([0-9][0-9])/([0-9][0-9])/([0-9]+)" );
+         boost::regex date_exp("([0-9][0-9])/([0-9][0-9])/([0-9]+)");
          boost::smatch parts;
-         if( data == "\"\"" )
+         if(data == "\"\"")
          {
             strm << "'0000-00-00'";
-         }
-         else if( boost::regex_match( data, parts, date_exp ) )
+         } else if(boost::regex_match(data, parts, date_exp))
          {
-            int day = boost::lexical_cast<int>( parts[2].str() );
-            int month = boost::lexical_cast<int>( parts[1].str() );
-            int year = boost::lexical_cast<int>( parts[3].str() );
-            if( year >=1000 )
+            int day = boost::lexical_cast<int>(parts[2].str());
+            int month = boost::lexical_cast<int>(parts[1].str());
+            int year = boost::lexical_cast<int>(parts[3].str());
+            if(year >= 1000)
             {
                // do nothing
-            }
-            else if( year >= 50 )
+            } else if(year >= 50)
             {
-               year += 1900; 
-            }
-            else
+               year += 1900;
+            } else
             {
                year += 2000;
             }
             strm.fill('0');
-            strm << '\'' << std::setw( 4 ) << year
-                 << '-' << std::setw( 2 ) << month
-                 << '-' << std::setw( 2 ) << day
+            strm << '\'' << std::setw(4) << year
+                 << '-' << std::setw(2) << month
+                 << '-' << std::setw(2) << day
                  << '\'';
-         }
-         else if( data.length() == 1 && data[0] == '?' )
+         } else if(data.length() == 1 && data[0] == '?')
          {
             // some sort of null I think
             strm << "NULL";
             // skip space past ?
             is.get();
-         }
-         else
+         } else
          {
-            strm << boost::lexical_cast<int>( data );
+            strm << boost::lexical_cast<int>(data);
          }
       }
-      break;
+         break;
 
       case character:
       {
          size_t char_count = 0;
-         char c = is.get(); ++char_count;
-         if( c == ' ' )
+         char c = is.get();
+         ++char_count;
+         if(c == ' ')
          {
-            c = is.get(); ++char_count;
+            c = is.get();
+            ++char_count;
          }
-         if( c != '"' )
+         if(c != '"')
          {
-            if( c == '?' )
+            if(c == '?')
             {
                strm << "NULL";
                break;
             }
-            throw std::logic_error( "Bad string field for field: " + name_ );
+            throw std::logic_error("Bad string field for field: " + name_);
          }
          // throw away starting quote
-         c = is.get(); ++char_count;
+         c = is.get();
+         ++char_count;
          // lets check not escaped quote at start
-         while( c == '"' && is.peek() == '"' )
+         while(c == '"' && is.peek() == '"')
          {
-            if( char_count > length_.value() + 10) throw std::logic_error( "too longA " + strm.str());
+            if(char_count > length_.value() + 10)
+               throw std::logic_error("too longA " + strm.str());
             strm << '"';
             // skip the peek
-            c = is.get(); ++char_count;
+            c = is.get();
+            ++char_count;
             // get next real char
-            c = is.get(); ++char_count;
+            c = is.get();
+            ++char_count;
          }
-         while( c != '"' )
+         while(c != '"')
          {
-            if( char_count > length_.value() + 10) break;
-            if( c == '\\' )
+            if(char_count > length_.value() + 10)
+               break;
+            if(c == '\\')
             {
                strm << '\\';
             }
-            if( c == '\'' )
+            if(c == '\'')
             {
                strm << '\\';
             }
             strm << c;
-            c = is.get(); ++char_count;
+            c = is.get();
+            ++char_count;
             // check if this is an escaped quote
-            while( c == '"' && is.peek() == '"' )
+            while(c == '"' && is.peek() == '"')
             {
-            if( char_count > length_.value() + 10) throw std::logic_error( "too longC " + strm.str());
+               if(char_count > length_.value() + 10)
+                  throw std::logic_error("too longC " + strm.str());
                strm << '"';
                // skip the peek
-               c = is.get(); ++char_count;
+               c = is.get();
+               ++char_count;
                // get next real char
-               c = is.get(); ++char_count;
+               c = is.get();
+               ++char_count;
             }
          }
          std::string temp = strm.str();
-         trim ( temp );
+         trim(temp);
          strm.str("");
-         if( temp.length() == 0 )
+         if(temp.length() == 0)
          {
-            if( mandatory_ )
+            if(mandatory_)
             {
                strm << "''";
-            }
-            else
+            } else
             {
                strm << "NULL";
             }
             // skip space past ?
             is.get();
-         }
-         else
+         } else
          {
             strm << '\'' << temp << '\'';
          }
       }
-      break;
+         break;
 
       case logical:
       {
          std::string data;
          is >> data;
-         if( data == "no" )
+         if(data == "no")
          {
             strm << "0";
-         }
-         else if ( data == "yes" )
+         } else if(data == "yes")
          {
             strm << "1";
-         }
-         else if ( data == "?" )
+         } else if(data == "?")
          {
             strm << "NULL";
-         }
-         else
+         } else
          {
             throw std::logic_error(" Unknown logical setting for field: " + name_ + " [" + data + "]");
          }
       }
-      break;
+         break;
       case decimal:
       {
          std::string data;
          is >> data;
-         if( data.length() == 1 && data[0] == '?' )
+         if(data.length() == 1 && data[0] == '?')
          {
             //stupid nulls
             strm << "NULL";
-         }
-         else
+         } else
          {
-            strm << boost::lexical_cast<double>( data );
+            strm << boost::lexical_cast<double>(data);
          }
       }
-      break;
+         break;
       case recid:
          // Record id is not usuall in dump file
          break;
@@ -350,32 +348,31 @@ std::string Field::insertStatement() const
    strm << '\'' << tableName_.value() << "',";
    strm << type_.value() + 1 << ", ";
 //   printOptional( strm, type_, false );
-   printOptional( strm, order_, false );
-   printOptional( strm, mandatory_, false );
-   printOptional( strm, length_, false );
-   printOptional( strm, description_ );
-   printOptional( strm, caseSensitive_, false );
-   printOptional( strm, decimals_, false );
-   printOptional( strm, position_, false );
-   printOptional( strm, initial_ );
-   printOptional( strm, format_ );
-   printOptional( strm, label_ );
-   printOptional( strm, columnLabel_ );
-   printOptional( strm, help_ );
-   printOptional( strm, valexp_ );
-   printOptional( strm, valmsg_ );
-   printOptional( strm, extent_, false, false );
+   printOptional(strm, order_, false);
+   printOptional(strm, mandatory_, false);
+   printOptional(strm, length_, false);
+   printOptional(strm, description_);
+   printOptional(strm, caseSensitive_, false);
+   printOptional(strm, decimals_, false);
+   printOptional(strm, position_, false);
+   printOptional(strm, initial_);
+   printOptional(strm, format_);
+   printOptional(strm, label_);
+   printOptional(strm, columnLabel_);
+   printOptional(strm, help_);
+   printOptional(strm, valexp_);
+   printOptional(strm, valmsg_);
+   printOptional(strm, extent_, false, false);
    strm << ");\n";
    return strm.str();
 }
 
 int Field::getOrder() const
 {
-   if( order_ )
+   if(order_)
    {
       return order_.value();
-   }
-   else
+   } else
    {
       return -1;
    }

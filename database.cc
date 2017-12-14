@@ -1,39 +1,39 @@
 #include <sstream>
 #include "database.h"
 
-std::ostream &operator<<( std::ostream &os, const Database &db )
+std::ostream &operator<<(std::ostream &os, const Database &db)
 {
    // Dump table defs
-   for( auto i : db)
+   for(auto &i : db.tables_)
    {
-      os << (*i);
+      os << i;
    }
    // Dump foreign keys
-   for( auto i : db)
+   for(auto &i : db.tables_)
    {
-//      os << i->getForeignKeysDefs();
+      os << i.getForeignKeysDefs();
    }
    os << Sequence::schema();
    os << "BEGIN;\n";
-   for( auto i : db)
+   for(auto &i : db.sequences_)
    {
-//      os << i->insertStatement();
+      os << i.insertStatement();
    }
    os << "COMMIT;\n";
 
    os << Table::schema();
    os << "BEGIN;\n";
-   for(auto i : db)
+   for(auto &i : db.tables_)
    {
-//      os << i->insertStatement();
+      os << i.insertStatement();
    }
    os << "COMMIT;\n";
 
    os << Field::schema();
    os << "BEGIN;\n";
-   for(auto i : db)
+   for(auto &i : db.tables_)
    {
-//      os << i->fieldinsertStatement();
+      os << i.fieldinsertStatement();
    }
    os << "COMMIT;\n";
    return os;
@@ -41,28 +41,28 @@ std::ostream &operator<<( std::ostream &os, const Database &db )
 
 void Database::convertDumpToSql()
 {
-   for(auto i : tables_)
+   for(auto &i : tables_)
    {
-      i->convertDumpToSql();
+      i.convertDumpToSql();
    }
 }
 
 std::string Database::dumpIndexesAsAlterTable() const
 {
    std::ostringstream strm;
-   for(auto i : tables_)
+   for(auto &i : tables_)
    {
-      strm << i->dumpIndexesAsAlterTable();
+      strm << i.dumpIndexesAsAlterTable();
    }
    return strm.str();
 }
 
-void Database::addTable(const Table &table)
+void Database::addTable(Table table)
 {
-   tables_.push_back(table);
+   tables_.emplace_back(table);
 }
 
-void Database::addSequence(const Sequence &sequence)
+void Database::addSequence(Sequence sequence)
 {
-   sequences_.push_back(sequence);
+   sequences_.emplace_back(std::move(sequence));
 }

@@ -22,7 +22,7 @@ class Table
       void sortFields();
       void convertDumpToSql();
       std::string getForeignKeysDefs() const;
-      void addIndex( const Index &index );
+      void addIndex(Index index);
       void addField( const Field &field );
       std::string getDescription() const;
       void reset();
