@@ -16,8 +16,8 @@ class Database
       friend std::ostream &operator<<( std::ostream &os, const Database &db );
 
       void convertDumpToSql();
-      void addTable( const Table &table ) { tables_.push_back( table ); }
-      void addSequence( const Sequence &sequence ) { sequences_.push_back( sequence ); }
+      void addTable( const Table &table );
+      void addSequence( const Sequence &sequence );
       std::string dumpIndexesAsAlterTable() const;
    private:
       Tables tables_;

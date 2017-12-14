@@ -12,23 +12,14 @@ class Index
    public:
       Index() { reset(); }
       friend std::ostream &operator<<( std::ostream &os, const Index &index );
-      void reset()
-      {
-         name_.clear();
-         unique_ = false;
-         primary_ = false;
-         fieldName_.clear();
-      }
-      void setUnique() { unique_ = true; }
+      void reset();
+      void setUnique();
       void setPrimary() { primary_ = true; }
-      void setName( const std::string &name ) { name_ = trimquote( name ); replacehypens( name_ ); }
-      void setTable( const std::string &name ) { tableName_ = trimquote( name ); }
-      void setArea( const std::string &s ) { area_  = trimquote( s ); }
+      void setName( const std::string &name );
+      void setTable( const std::string &name );
+      void setArea( const std::string &s );
       void setWord() { word_ = 1; }
-      void addIndexField( const std::string &fieldName, bool direction)
-      {
-         fieldName_.push_back( std::make_pair( trimquote( fieldName ), direction ) );
-      }
+      void addIndexField( const std::string &fieldName, bool direction);
       static std::string schema();
       std::string insertStatement() const;
       template<class T>

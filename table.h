@@ -22,16 +22,16 @@ class Table
       void sortFields();
       void convertDumpToSql();
       std::string getForeignKeysDefs() const;
-      void addIndex( const Index &index ) { indexes_.push_back( index ); }
+      void addIndex( const Index &index );
       void addField( const Field &field );
       std::string getDescription() const;
       void reset();
-      void setName( const std::string &name ) { tableName_ = trimquote( name ); }
-      void setDescription( const std::string &s ) { description_ = trimquote( s ); escapestring( description_.value() ); }
-      void setDumpName( const std::string &s ) { dumpName_ = trimquote( s ); }
-      void setLabel( const std::string &s ) { label_ = trimquote( s ); }
-      void setValexp( const std::string &s ) { valexp_ = trimquote( s ); }
-      void setValmsg( const std::string &s ) { valmsg_ = trimquote( s ); escapestring( valmsg_.value() ); }
+      void setName( const std::string &name );
+      void setDescription( const std::string &s );
+      void setDumpName( const std::string &s );
+      void setLabel( const std::string &s );
+      void setValexp( const std::string &s );
+      void setValmsg( const std::string &s );
       static std::string schema();
       std::string insertStatement() const;
       std::string fieldinsertStatement() const;

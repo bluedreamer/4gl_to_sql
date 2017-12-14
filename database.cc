@@ -4,18 +4,18 @@
 std::ostream &operator<<( std::ostream &os, const Database &db )
 {
    // Dump table defs
-   for( Database::Tables::const_iterator i=db.tables_.begin(), end=db.tables_.end(); i!=end; ++i)
+   for( auto i : db)
    {
       os << (*i);
    }
    // Dump foreign keys
-   for( Database::Tables::const_iterator i=db.tables_.begin(), end=db.tables_.end(); i!=end; ++i)
+   for( auto i : db)
    {
 //      os << i->getForeignKeysDefs();
    }
    os << Sequence::schema();
    os << "BEGIN;\n";
-   for( Database::Sequences::const_iterator i=db.sequences_.begin(), end=db.sequences_.end(); i!=end; ++i)
+   for( auto i : db)
    {
 //      os << i->insertStatement();
    }
@@ -23,7 +23,7 @@ std::ostream &operator<<( std::ostream &os, const Database &db )
 
    os << Table::schema();
    os << "BEGIN;\n";
-   for( Database::Tables::const_iterator i=db.tables_.begin(), end=db.tables_.end(); i!=end; ++i)
+   for(auto i : db)
    {
 //      os << i->insertStatement();
    }
@@ -31,7 +31,7 @@ std::ostream &operator<<( std::ostream &os, const Database &db )
 
    os << Field::schema();
    os << "BEGIN;\n";
-   for( Database::Tables::const_iterator i=db.tables_.begin(), end=db.tables_.end(); i!=end; ++i)
+   for(auto i : db)
    {
 //      os << i->fieldinsertStatement();
    }
@@ -41,7 +41,7 @@ std::ostream &operator<<( std::ostream &os, const Database &db )
 
 void Database::convertDumpToSql()
 {
-   for( Tables::iterator i=tables_.begin(), end=tables_.end(); i!=end; ++i)
+   for(auto i : tables_)
    {
       i->convertDumpToSql();
    }
@@ -50,9 +50,19 @@ void Database::convertDumpToSql()
 std::string Database::dumpIndexesAsAlterTable() const
 {
    std::ostringstream strm;
-   for( Tables::const_iterator i=tables_.begin(), end=tables_.end(); i!=end; ++i)
+   for(auto i : tables_)
    {
       strm << i->dumpIndexesAsAlterTable();
    }
    return strm.str();
+}
+
+void Database::addTable(const Table &table)
+{
+   tables_.push_back(table);
+}
+
+void Database::addSequence(const Sequence &sequence)
+{
+   sequences_.push_back(sequence);
 }

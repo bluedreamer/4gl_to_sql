@@ -23,7 +23,7 @@ void Table::reset()
    extentFields_.clear();
 }
 
-bool compField(Field l, Field r)
+bool compField(const Field &l, const Field &r)
 {
    if( l.getOrder() == r.getOrder() )
    {
@@ -61,10 +61,10 @@ std::ostream &operator<<(std::ostream &os, const Table &table)
    os << "DROP TABLE IF EXISTS `"<< table.tableName_ << "`;\n";
    os << "CREATE TABLE `" << table.tableName_ << "`\n";
    os << "(\n";
-   for( Table::Fields::const_iterator i=table.fields_.begin(),end=table.fields_.end(); i!=end; ++i)
+   for(auto i : table)
    {
       os << (*i);
-      if( i + 1 != end )
+      if( i + 1 != table.end() )
       {
          os << ",\n";
       }
@@ -76,7 +76,7 @@ std::ostream &operator<<(std::ostream &os, const Table &table)
    if( table.indexes_.size() && outputTableIndexes )
    {
       os << ", ";
-      for( Table::Indexes::const_iterator i=table.indexes_.begin(),end=table.indexes_.end(); i!=end; ++i)
+      for( auto i : table)
       {
          std::vector<std::string> fieldsInIndex;
          i->getFieldList( fieldsInIndex );
@@ -149,11 +149,11 @@ void Table::convertDumpToSql()
          std::istringstream instrm( line );
    //      std::cout << tableName_ << ':' << line << std::endl;
          out << "INSERT INTO `" << tableName_ << "` VALUES(";
-         for( Table::Fields::iterator i=fields_.begin(),end=fields_.end(); i!=end; ++i)
+         for( auto i : fields_)
          {
             i->readData( instrm );
             i->printData( out );
-            if( i + 1 != end )
+            if( i + 1 != fields_.end() )
             {
                out << ", ";
             }
@@ -216,7 +216,7 @@ std::string Table::fieldinsertStatement() const
    std::ostringstream strm;
    std::string debug;
    strm << "DELETE FROM `" << tableName_ << "`;\n";
-   for( Table::Fields::const_iterator i=fields_.begin(),end=fields_.end(); i!=end; ++i)
+   for( auto i : fields_)
    {
       strm << i->insertStatement(); 
       debug=strm.str();
@@ -264,7 +264,7 @@ bool Table::areAnyFieldsInExtentList( const std::vector<std::string> &list ) con
 {
    for( size_t i = 0; i < list.size(); ++i)
    {
-      FieldMap::const_iterator it = extentFields_.find( list[ i ] );
+      auto it = extentFields_.find( list[ i ] );
       if( it != extentFields_.end() )
       {
          return true;
@@ -276,9 +276,46 @@ bool Table::areAnyFieldsInExtentList( const std::vector<std::string> &list ) con
 std::string Table::dumpIndexesAsAlterTable() const
 {
    std::ostringstream strm;
-   for( Indexes::const_iterator i = indexes_.begin(),end=indexes_.end(); i!=end; ++i)   
+   for( auto i : indexes_)
    {
       strm << i->dumpIndexesAsAlterTable( tableName_ ) << std::endl;
    }
    return strm.str();
+}
+
+void Table::setDescription(const std::string &s)
+{
+   description_ = trimquote(s);
+   escapestring(description_.value());
+}
+
+void Table::setValmsg(const std::string &s)
+{
+   valmsg_ = trimquote(s);
+   escapestring(valmsg_.value());
+}
+
+void Table::setValexp(const std::string &s)
+{
+   valexp_ = trimquote(s);
+}
+
+void Table::addIndex(const Index &index)
+{
+   indexes_.push_back(index);
+}
+
+void Table::setName(const std::string &name)
+{
+   tableName_ = trimquote(name);
+}
+
+void Table::setDumpName(const std::string &s)
+{
+   dumpName_ = trimquote(s);
+}
+
+void Table::setLabel(const std::string &s)
+{
+   label_ = trimquote(s);
 }

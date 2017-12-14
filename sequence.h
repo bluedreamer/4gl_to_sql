@@ -10,12 +10,12 @@ class Sequence
    public:
       Sequence() { reset(); }
       void reset();
-      void setName( const std::string &s ) { name_ = trimquote( s ); }
-      void setInitial( int i ) { initial_ = i; }
-      void setIncrement( int i ) { increment_ = i; }
-      void setCylceOnLimit( bool b ) { cycleOnLimit_ = b; }
-      void setMinVal( int i ) { minVal_ = i; }
-      void setMaxVal( int i ) { maxVal_ = i; }
+      void setName( const std::string &s );
+      void setInitial( int i );
+      void setIncrement( int i );
+      void setCylceOnLimit( bool b );
+      void setMinVal( int i );
+      void setMaxVal( int i );
       static std::string schema();
       std::string insertStatement() const;
       template<class T>

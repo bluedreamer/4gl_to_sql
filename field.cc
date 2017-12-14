@@ -388,68 +388,119 @@ size_t Field::getExtentOrder() const
 
 size_t Field::getExtent() const
 {
-   if ( extent_ )
+   if(extent_)
       return extent_.value();
    else
       return 1;
 }
 
-const std::string& Field::getName() const { return name_; }
+const std::string &Field::getName() const
+{
+   return name_;
+}
 
-int Field::getLength() const { return length_.value(); }
+int Field::getLength() const
+{
+   return length_.value();
+}
 
-void Field::printData(std::ostream& os) { os << fieldData_; }
+void Field::printData(std::ostream &os)
+{
+   os << fieldData_;
+}
 
-void Field::setDescription(const std::string& s) {
+void Field::setDescription(const std::string &s)
+{
    description_ = trimquote(s);
    escapestring(description_.value());
 }
 
-void Field::setCaseSensitive() { caseSensitive_ = true; }
+void Field::setCaseSensitive()
+{
+   caseSensitive_ = true;
+}
 
-void Field::setDecimal(int d) { decimals_ = d; }
+void Field::setDecimal(int d)
+{
+   decimals_ = d;
+}
 
-void Field::setOrder(int d) { order_ = d; }
+void Field::setOrder(int d)
+{
+   order_ = d;
+}
 
-void Field::setMandatory() { mandatory_ = true; }
+void Field::setMandatory()
+{
+   mandatory_ = true;
+}
 
-void Field::setPosition(int d) { position_ = d; }
+void Field::setPosition(int d)
+{
+   position_ = d;
+}
 
-void Field::setName(const std::string& name) { name_ = trimquote(name); }
+void Field::setName(const std::string &name)
+{
+   name_ = trimquote(name);
+}
 
-void Field::setType(int type) { type_ = (datatype) type; }
+void Field::setType(int type)
+{
+   type_ = (datatype) type;
+}
 
-void Field::setLength(int len) { length_ = len; }
+void Field::setLength(int len)
+{
+   length_ = len;
+}
 
-void Field::setTable(const std::string& s) { tableName_ = trimquote(s); }
+void Field::setTable(const std::string &s)
+{
+   tableName_ = trimquote(s);
+}
 
-void Field::setInitial(const std::string& s) { initial_ = trimquote(s); }
+void Field::setInitial(const std::string &s)
+{
+   initial_ = trimquote(s);
+}
 
-void Field::setFormat(const std::string& s) { format_ = trimquote(s); }
+void Field::setFormat(const std::string &s)
+{
+   format_ = trimquote(s);
+}
 
-void Field::setLabel(const std::string& s) {
+void Field::setLabel(const std::string &s)
+{
    label_ = trimquote(s);
    escapestring(label_.value());
 }
 
-void Field::setColumnLabel(const std::string& s) {
+void Field::setColumnLabel(const std::string &s)
+{
    columnLabel_ = trimquote(s);
    escapestring(columnLabel_.value());
 }
 
-void Field::setHelp(const std::string& s) {
+void Field::setHelp(const std::string &s)
+{
    help_ = trimquote(s);
    escapestring(help_.value());
 }
 
-void Field::setValexp(const std::string& s) {
+void Field::setValexp(const std::string &s)
+{
    valexp_ = trimquote(s);
    escapestring(valexp_.value());
 }
 
-void Field::setValmsg(const std::string& s) {
+void Field::setValmsg(const std::string &s)
+{
    valmsg_ = trimquote(s);
    escapestring(valmsg_.value());
 }
 
-void Field::setExtentOrder(size_t i) { extentOrder_ = i; }
+void Field::setExtentOrder(size_t i)
+{
+   extentOrder_ = i;
+}

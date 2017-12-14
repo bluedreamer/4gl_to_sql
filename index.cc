@@ -124,3 +124,37 @@ std::string Index::dumpIndexesAsAlterTable( const std::string &tablename ) const
    strm << ");";
    return strm.str();
 }
+
+void Index::reset()
+{
+   name_.clear();
+   unique_ = false;
+   primary_ = false;
+   fieldName_.clear();
+}
+
+void Index::setName(const std::string &name)
+{
+   name_ = trimquote(name);
+   replacehypens(name_);
+}
+
+void Index::setUnique()
+{
+   unique_ = true;
+}
+
+void Index::setTable(const std::string &name)
+{
+   tableName_ = trimquote(name);
+}
+
+void Index::addIndexField(const std::string &fieldName, bool direction)
+{
+   fieldName_.push_back(std::make_pair(trimquote(fieldName), direction));
+}
+
+void Index::setArea(const std::string &s)
+{
+   area_ = trimquote(s);
+}
